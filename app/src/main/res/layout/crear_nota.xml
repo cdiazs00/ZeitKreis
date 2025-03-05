@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/login"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Login">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/groupContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/TextoTexto"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="Texto"
+            app:layout_constraintStart_toStartOf="@id/BarraTexto"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="HardcodedText" />
+
+        <EditText
+            android:background="@android:color/darker_gray"
+            android:id="@+id/BarraTexto"
+            android:importantForAutofill="no"
+            android:inputType="text"
+            android:layout_height="wrap_content"
+            android:layout_width="300dp"
+            android:minHeight="48dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/TextoTexto"
+            tools:ignore="LabelFor,SpeakableTextPresentCheck,VisualLintTextFieldSize" />
+
+        <TextView
+            android:id="@+id/TipoTexto"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:layout_width="wrap_content"
+            android:text="Tipo"
+            app:layout_constraintStart_toStartOf="@id/BarraTipo"
+            app:layout_constraintTop_toBottomOf="@id/BarraTexto"
+            tools:ignore="HardcodedText" />
+
+        <Spinner
+            android:background="@android:color/darker_gray"
+            android:id="@+id/BarraTipo"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/TipoTexto"
+            tools:ignore="LabelFor,SpeakableTextPresentCheck,VisualLintTextFieldSize" />
+
+        <TextView
+            android:id="@+id/FechaTexto"
+            android:layout_marginTop="50dp"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="Fecha"
+            app:layout_constraintStart_toStartOf="@id/BarraTipo"
+            app:layout_constraintTop_toBottomOf="@id/BarraTipo"
+            tools:ignore="HardcodedText,MissingConstraints" />
+
+        <EditText
+            android:background="@android:color/darker_gray"
+            android:id="@+id/BarraFecha"
+            android:importantForAutofill="no"
+            android:inputType="text"
+            android:layout_height="wrap_content"
+            android:layout_width="300dp"
+            android:minHeight="48dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/FechaTexto"
+            tools:ignore="LabelFor,SpeakableTextPresentCheck,VisualLintTextFieldSize" />
+
+        <TextView
+            android:id="@+id/HoraTexto"
+            android:layout_marginTop="50dp"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="Hora"
+            app:layout_constraintStart_toStartOf="@id/BarraTipo"
+            app:layout_constraintTop_toBottomOf="@id/BarraFecha"
+            tools:ignore="HardcodedText,MissingConstraints" />
+
+        <EditText
+            android:background="@android:color/darker_gray"
+            android:id="@+id/BarraHora"
+            android:importantForAutofill="no"
+            android:inputType="text"
+            android:layout_height="wrap_content"
+            android:layout_width="300dp"
+            android:minHeight="48dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/HoraTexto"
+            tools:ignore="LabelFor,SpeakableTextPresentCheck,VisualLintTextFieldSize" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

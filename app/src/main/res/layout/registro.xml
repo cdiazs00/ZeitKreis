@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/login"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Login">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/groupContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp">
+
+        <TextView
+            android:id="@+id/NombreTexto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nombre de usuario:"
+            app:layout_constraintBottom_toTopOf="@id/BarraNombre"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:ignore="HardcodedText" />
+
+        <EditText
+            android:id="@+id/BarraNombre"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:autofillHints=""
+            android:minHeight="48dp"
+            android:background="@android:color/darker_gray"
+            android:inputType="text"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/CorreoTexto"
+            tools:ignore="LabelFor,SpeakableTextPresentCheck,VisualLintTextFieldSize" />
+
+        <TextView
+            android:id="@+id/CorreoTexto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:text="Correo electrónico:"
+            app:layout_constraintTop_toBottomOf="@id/BarraNombre"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:ignore="HardcodedText" />
+
+        <EditText
+            android:id="@+id/BarraCorreo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:autofillHints=""
+            android:minHeight="48dp"
+            android:background="@android:color/darker_gray"
+            android:inputType="text"
+            app:layout_constraintTop_toBottomOf="@id/CorreoTexto"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:ignore="LabelFor,SpeakableTextPresentCheck,VisualLintTextFieldSize" />
+
+        <TextView
+            android:id="@+id/ContraseñaTexto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:text="Contraseña:"
+            app:layout_constraintTop_toBottomOf="@id/BarraCorreo"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:ignore="HardcodedText" />
+
+        <EditText
+            android:id="@+id/BarraContraseña"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:autofillHints=""
+            android:minHeight="48dp"
+            android:background="@android:color/darker_gray"
+            android:inputType="text"
+            app:layout_constraintTop_toBottomOf="@id/ContraseñaTexto"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:ignore="LabelFor,SpeakableTextPresentCheck,VisualLintTextFieldSize" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/BotonIniciarSesion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="100dp"
+            android:text="Crear cuenta"
+            app:layout_constraintTop_toBottomOf="@id/BarraContraseña"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:ignore="HardcodedText,VisualLintButtonSize" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/login"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AjustesCuenta">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/groupContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/BotonFondoPantalla"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:text="Cambiar foto de perfil"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:ignore="HardcodedText,MissingConstraints,TextSizeCheck" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/BotonColorNotas"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:text="Cambiar nombre de usuario"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/BotonFondoPantalla"
+            tools:ignore="HardcodedText,VisualLintButtonSize,TextSizeCheck" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/BotonIdioma"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:text="Cambiar cuenta"
+            app:layout_constraintTop_toBottomOf="@id/BotonColorNotas"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:ignore="HardcodedText,VisualLintButtonSize" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/BotonNotificaciones"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:text="Cambiar contraseña"
+            app:layout_constraintTop_toBottomOf="@id/BotonIdioma"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:ignore="HardcodedText,VisualLintButtonSize" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
