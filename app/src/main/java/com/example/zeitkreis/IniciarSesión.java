@@ -15,7 +15,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-public class Login extends AppCompatActivity {
+public class IniciarSesión extends AppCompatActivity {
 
     private String correo, contrasena;
 
@@ -38,12 +38,12 @@ public class Login extends AppCompatActivity {
             if (correo != null && contrasena != null) {
                 new VerificarUsuarioTask().execute(correo, contrasena);
             } else {
-                Toast.makeText(Login.this, "Faltan credenciales", Toast.LENGTH_SHORT).show();
+                Toast.makeText(IniciarSesión.this, "Faltan credenciales", Toast.LENGTH_SHORT).show();
             }
         });
 
         registrarse.setOnClickListener(v -> {
-            Intent intent = new Intent(Login.this, Registro.class);
+            Intent intent = new Intent(IniciarSesión.this, Registro.class);
             startActivity(intent);
             finish();
         });
@@ -59,24 +59,23 @@ public class Login extends AppCompatActivity {
 
             try {
                 Class.forName("org.postgresql.Driver");
-                @SuppressLint("AuthLeak")
-                Connection connection = DriverManager.getConnection(
-                        "jdbc:postgresql://tramway.proxy.rlwy.net:19873/railway",
-                        "postgres", "oLxAxHNYTNePUtbYboqIwDAxUNOGUtpK");
 
-                String query = "SELECT * FROM usuarios WHERE Correo_Electrónico = ? AND Contraseña = ?";
-                PreparedStatement statement = connection.prepareStatement(query);
-                statement.setString(1, usuario);
-                statement.setString(2, contrasena);
+                String dbUrl = ConfigUtil.getMetaData(getApplicationContext(), "DB_URL");
+                String dbUser = ConfigUtil.getMetaData(getApplicationContext(), "DB_USER");
+                String dbPassword = ConfigUtil.getMetaData(getApplicationContext(), "DB_PASSWORD");
 
-                ResultSet resultSet = statement.executeQuery();
-                if (resultSet.next()) {
-                    resultado = true;
+                try (Connection connection = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
+                     PreparedStatement statement = connection.prepareStatement(
+                             "SELECT 1 FROM usuarios WHERE Correo_Electrónico = ? AND Contraseña = ? LIMIT 1")) {
+
+                    statement.setString(1, usuario);
+                    statement.setString(2, contrasena);
+
+                    try (ResultSet resultSet = statement.executeQuery()) {
+                        resultado = resultSet.next();
+                    }
                 }
 
-                resultSet.close();
-                statement.close();
-                connection.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -86,11 +85,11 @@ public class Login extends AppCompatActivity {
         @Override
         protected void onPostExecute(Boolean resultado) {
             if (resultado) {
-                Intent intent = new Intent(Login.this, MenuPrincipal.class);
+                Intent intent = new Intent(IniciarSesión.this, MenuPrincipal.class);
                 startActivity(intent);
                 finish();
             } else {
-                Toast.makeText(Login.this, "Correo o contraseña incorrectos", Toast.LENGTH_SHORT).show();
+                Toast.makeText(IniciarSesión.this, "Credenciales incorrectas", Toast.LENGTH_SHORT).show();
             }
         }
     }

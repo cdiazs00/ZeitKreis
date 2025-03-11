@@ -14,8 +14,19 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ZeitKreis"
         tools:targetApi="31">
+
+        <meta-data
+            android:name="DB_URL"
+            android:value="${DB_URL}" />
+        <meta-data
+            android:name="DB_USER"
+            android:value="${DB_USER}" />
+        <meta-data
+            android:name="DB_PASSWORD"
+            android:value="${DB_PASSWORD}" />
+
         <activity
-            android:name=".Login"
+            android:name=".IniciarSesión"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
