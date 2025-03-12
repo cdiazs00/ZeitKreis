@@ -1,4 +1,3 @@
-# Usar Ubuntu 20.04 como imagen base
 FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -31,10 +30,14 @@ RUN mkdir -p /usr/local/android-sdk-linux/cmdline-tools && cd /usr/local/android
     rm android-sdk.zip
 
 ENV ANDROID_HOME=/usr/local/android-sdk-linux
-ENV PATH=$PATH:$ANDROID_HOME/cmdline-tools/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/30.0.3
+ENV PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/30.0.3
 
-RUN yes | sdkmanager --licenses && \
-    sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.3" "tools"
+RUN echo $ANDROID_HOME && \
+    ls $ANDROID_HOME/cmdline-tools/latest/bin && \
+    ls $ANDROID_HOME/platform-tools
+
+RUN yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses && \
+    $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.3" "tools"
 
 RUN wget https://services.gradle.org/distributions/gradle-7.3.3-bin.zip -P /opt/ && \
     unzip /opt/gradle-7.3.3-bin.zip -d /opt/ && \
