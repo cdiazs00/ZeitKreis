@@ -1,6 +1,4 @@
-FROM openjdk:11-jdk
-
-WORKDIR /workspace
+FROM ubuntu:20.04
 
 RUN apt-get update && apt-get install -y \
     wget \
@@ -8,6 +6,7 @@ RUN apt-get update && apt-get install -y \
     curl \
     git \
     build-essential \
+    openjdk-11-jdk \
     libncurses5 \
     libstdc++6 \
     zlib1g \
@@ -17,14 +16,13 @@ RUN apt-get update && apt-get install -y \
     lib32gcc-s1 \
     && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p /opt/android-sdk-linux && \
-    cd /opt/android-sdk-linux && \
-    wget https://dl.google.com/android/repository/commandlinetools-linux-7583922_latest.zip && \
-    unzip commandlinetools-linux-7583922_latest.zip && \
-    rm commandlinetools-linux-7583922_latest.zip
+RUN mkdir -p /usr/local/android-sdk-linux && cd /usr/local/android-sdk-linux && \
+    wget https://dl.google.com/android/repository/commandlinetools-linux-7583922_latest.zip -O android-sdk.zip && \
+    unzip android-sdk.zip && \
+    rm android-sdk.zip
 
-ENV ANDROID_SDK_ROOT /opt/android-sdk-linux
-ENV PATH $ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH
+ENV ANDROID_HOME=/usr/local/android-sdk-linux
+ENV PATH=$PATH:$ANDROID_HOME/cmdline-tools/bin
 
 RUN yes | sdkmanager --licenses && \
     sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.3" "tools"
