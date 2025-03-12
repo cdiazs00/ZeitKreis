@@ -1,6 +1,19 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
 }
+
+val localProperties = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) {
+        load(file.inputStream())
+    }
+}
+
+val dbUrl: String = System.getenv("DB_URL") ?: localProperties.getProperty("DB_URL", "")
+val dbUser: String = System.getenv("DB_USER") ?: localProperties.getProperty("DB_USER", "")
+val dbPassword: String = System.getenv("DB_PASSWORD") ?: localProperties.getProperty("DB_PASSWORD", "")
 
 android {
     namespace = "com.example.zeitkreis"
@@ -15,6 +28,14 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        manifestPlaceholders.putAll(
+            mapOf(
+                "DB_URL" to dbUrl,
+                "DB_USER" to dbUser,
+                "DB_PASSWORD" to dbPassword
+            )
+        )
     }
 
     buildTypes {
