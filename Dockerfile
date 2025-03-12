@@ -14,8 +14,7 @@ RUN apt-get update && apt-get install -y \
     lib32z1 \
     lib32ncurses6 \
     lib32stdc++6 \
-    lib32gcc1 \
-    lib32libc6 \
+    lib32gcc-s1 \
     && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /opt/android-sdk-linux && \
