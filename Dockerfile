@@ -1,3 +1,4 @@
+# Usar Ubuntu 20.04 como imagen base
 FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -24,13 +25,13 @@ RUN echo "Etc/UTC" > /etc/timezone && \
     ln -sf /usr/share/zoneinfo/Etc/UTC /etc/localtime && \
     dpkg-reconfigure --frontend=noninteractive tzdata
 
-RUN mkdir -p /usr/local/android-sdk-linux && cd /usr/local/android-sdk-linux && \
+RUN mkdir -p /usr/local/android-sdk-linux/cmdline-tools && cd /usr/local/android-sdk-linux/cmdline-tools && \
     wget https://dl.google.com/android/repository/commandlinetools-linux-7583922_latest.zip -O android-sdk.zip && \
     unzip android-sdk.zip && \
     rm android-sdk.zip
 
 ENV ANDROID_HOME=/usr/local/android-sdk-linux
-ENV PATH=$PATH:$ANDROID_HOME/cmdline-tools/bin
+ENV PATH=$PATH:$ANDROID_HOME/cmdline-tools/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/30.0.3
 
 RUN yes | sdkmanager --licenses && \
     sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.3" "tools"
