@@ -1,7 +1,12 @@
+# Usar Ubuntu 20.04 como imagen base
 FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=UTC
+
+RUN echo "Etc/UTC" > /etc/timezone && \
+    ln -sf /usr/share/zoneinfo/Etc/UTC /etc/localtime && \
+    dpkg-reconfigure --frontend=noninteractive tzdata
 
 RUN apt-get update && apt-get install -y \
     wget \
@@ -17,6 +22,7 @@ RUN apt-get update && apt-get install -y \
     lib32ncurses6 \
     lib32stdc++6 \
     lib32gcc-s1 \
+    tzdata \
     && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /usr/local/android-sdk-linux && cd /usr/local/android-sdk-linux && \
