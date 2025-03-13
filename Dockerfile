@@ -48,7 +48,8 @@ RUN wget https://services.gradle.org/distributions/gradle-7.3.3-bin.zip -P /opt/
 ENV GRADLE_HOME /opt/gradle-7.3.3
 ENV PATH $GRADLE_HOME/bin:$PATH
 
-COPY . /workspace/
+WORKDIR /workspace
+COPY . /workspace
 
 RUN gradle clean build
 
