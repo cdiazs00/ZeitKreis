@@ -24,17 +24,21 @@ RUN echo "Etc/UTC" > /etc/timezone && \
     ln -sf /usr/share/zoneinfo/Etc/UTC /etc/localtime && \
     dpkg-reconfigure --frontend=noninteractive tzdata
 
-RUN mkdir -p /usr/local/android-sdk-linux/cmdline-tools && cd /usr/local/android-sdk-linux/cmdline-tools && \
-    wget https://dl.google.com/android/repository/commandlinetools-linux-7583922_latest.zip -O android-sdk.zip && \
+RUN mkdir -p /usr/local/android-sdk-linux/cmdline-tools
+
+WORKDIR /usr/local/android-sdk-linux/cmdline-tools
+RUN wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O android-sdk.zip && \
     unzip android-sdk.zip && \
     rm android-sdk.zip
+
+RUN mv /usr/local/android-sdk-linux/cmdline-tools/cmdline-tools /usr/local/android-sdk-linux/cmdline-tools/latest
 
 ENV ANDROID_HOME=/usr/local/android-sdk-linux
 ENV PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/30.0.3
 
-RUN echo $ANDROID_HOME && \
-    ls $ANDROID_HOME/cmdline-tools/latest/bin && \
-    ls $ANDROID_HOME/platform-tools
+RUN echo "ANDROID_HOME: $ANDROID_HOME" && \
+    ls -l $ANDROID_HOME/cmdline-tools/latest/bin && \
+    ls -l $ANDROID_HOME/platform-tools || echo "platform-tools directory not found"
 
 RUN yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses && \
     $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.3" "tools"
