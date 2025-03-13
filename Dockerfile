@@ -48,6 +48,8 @@ RUN wget https://services.gradle.org/distributions/gradle-7.3.3-bin.zip -P /opt/
 ENV GRADLE_HOME /opt/gradle-7.3.3
 ENV PATH $GRADLE_HOME/bin:$PATH
 
+ENV GRADLE_OPTS="-Dorg.gradle.daemon=false -Dorg.gradle.unsafe.watch-fs=false"
+
 WORKDIR /workspace
 COPY . /workspace
 
