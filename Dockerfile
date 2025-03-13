@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y \
     curl \
     git \
     build-essential \
-    openjdk-11-jdk \
+    openjdk-17-jdk \
     libncurses5 \
     libstdc++6 \
     zlib1g \
@@ -36,9 +36,7 @@ RUN mv /usr/local/android-sdk-linux/cmdline-tools/cmdline-tools /usr/local/andro
 ENV ANDROID_HOME=/usr/local/android-sdk-linux
 ENV PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/30.0.3
 
-RUN echo "ANDROID_HOME: $ANDROID_HOME" && \
-    ls -l $ANDROID_HOME/cmdline-tools/latest/bin && \
-    ls -l $ANDROID_HOME/platform-tools || echo "platform-tools directory not found"
+RUN java -version
 
 RUN yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses && \
     $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.3" "tools"
