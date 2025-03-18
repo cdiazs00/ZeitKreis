@@ -64,11 +64,8 @@ dependencies {
     implementation(libs.logging.interceptor)
     implementation(libs.material)
     implementation(libs.navigation.fragment)
-    implementation(libs.navigation.fragment.v287)
     implementation(libs.navigation.ui)
-    implementation(libs.navigation.ui.v287)
     implementation(libs.postgresql)
-    implementation(libs.postgresql.v4260)
     implementation(libs.retrofit)
     testImplementation(libs.junit)
 }

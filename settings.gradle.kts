@@ -20,4 +20,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name
+rootProject.name = "Zeitkreis"
+include(":app")
