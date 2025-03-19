@@ -60,6 +60,7 @@ dependencies {
     implementation(libs.appcompat)
     implementation(libs.converter.gson)
     implementation(libs.constraintlayout)
+    implementation(libs.groovy.all)
     implementation(libs.jakarta.persistence.api)
     implementation(libs.logging.interceptor)
     implementation(libs.material)
