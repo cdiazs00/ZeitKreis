@@ -26,24 +26,29 @@
             android:value="${DB_PASSWORD}" />
 
         <activity
-            android:name=".IniciarSesión"
+            android:name=".IniciarSesion"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".MenuPrincipal" />
+
         <activity
             android:name=".Registro" />
+
         <activity
             android:name=".Agendas" />
+
         <activity
             android:name=".CalendarioGlobal" />
+
         <activity
             android:name=".Amigos" />
+
     </application>
 
 </manifest>

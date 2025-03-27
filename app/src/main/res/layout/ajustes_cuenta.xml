@@ -20,7 +20,7 @@
         android:layout_marginEnd="16dp">
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/BotonFondoPantalla"
+            android:id="@+id/BotonFotoPerfil"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:text="Cambiar foto de perfil"
@@ -29,34 +29,23 @@
             tools:ignore="HardcodedText,MissingConstraints,TextSizeCheck" />
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/BotonColorNotas"
+            android:id="@+id/BotonNombreUsuario"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="50dp"
             android:text="Cambiar nombre de usuario"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/BotonFondoPantalla"
+            app:layout_constraintTop_toBottomOf="@id/BotonFotoPerfil"
             tools:ignore="HardcodedText,VisualLintButtonSize,TextSizeCheck" />
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/BotonIdioma"
-            android:layout_width="250dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="50dp"
-            android:text="Cambiar cuenta"
-            app:layout_constraintTop_toBottomOf="@id/BotonColorNotas"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            tools:ignore="HardcodedText,VisualLintButtonSize" />
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/BotonNotificaciones"
+            android:id="@+id/BotonCambiarContrasena"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="50dp"
             android:text="Cambiar contraseña"
-            app:layout_constraintTop_toBottomOf="@id/BotonIdioma"
+            app:layout_constraintTop_toBottomOf="@id/BotonNombreUsuario"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             tools:ignore="HardcodedText,VisualLintButtonSize" />

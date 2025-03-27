@@ -27,29 +27,27 @@
 
     <TextView
         android:id="@+id/nombre_usuario"
-        android:text="Sirzech9946"
         android:layout_width="wrap_content"
         android:layout_height="20dp"
         android:layout_marginTop="10dp"
         android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/imagen_perfil"
         app:layout_constraintStart_toStartOf="parent"
-        tools:ignore="MissingConstraints" />
+        app:layout_constraintTop_toBottomOf="@id/imagen_perfil"
+        tools:ignore="MissingConstraints,TextSizeCheck" />
+
     <TextView
         android:id="@+id/Correo_usuario"
-        android:text="ZeitKreis@gmail.com"
         android:layout_width="wrap_content"
         android:layout_height="20dp"
         android:layout_marginBottom="10dp"
         android:textColor="@color/black"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/nombre_usuario"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@id/inner_constraint_layout"
-        tools:ignore="MissingConstraints" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/nombre_usuario"
+        tools:ignore="MissingConstraints,TextSizeCheck" />
 
-    <!-- Segundo ConstraintLayout donde estarán los elementos -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/inner_constraint_layout"
         android:layout_width="0dp"
@@ -75,7 +73,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toTopOf="@id/Ajustes_de_Cuenta"
             app:layout_constraintTop_toBottomOf="@id/inner_constraint_layout"
-            app:layout_constraintHorizontal_bias="0.5" />
+            app:layout_constraintHorizontal_bias="0.5"
+            tools:ignore="HardcodedText" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/Ajustes_de_Cuenta"
@@ -92,7 +91,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toTopOf="@id/Cerrar_sesion"
             app:layout_constraintTop_toBottomOf="@id/Ajustes_Generales"
-            app:layout_constraintHorizontal_bias="0.5" />
+            app:layout_constraintHorizontal_bias="0.5"
+            tools:ignore="HardcodedText" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/Cerrar_sesion"
@@ -109,7 +109,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/Ajustes_de_Cuenta"
             app:layout_constraintBottom_toBottomOf="@id/inner_constraint_layout"
-            app:layout_constraintHorizontal_bias="0.5" />
+            app:layout_constraintHorizontal_bias="0.5"
+            tools:ignore="HardcodedText" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

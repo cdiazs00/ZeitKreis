@@ -3,10 +3,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/login"
+    android:id="@+id/registro"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".IniciarSesión">
+    tools:context=".Registro">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/groupContainer"
@@ -33,13 +33,14 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:autofillHints=""
-            android:minHeight="48dp"
-            android:background="@android:color/darker_gray"
+            android:hint="Ingresa tu nombre"
             android:inputType="text"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:minHeight="48dp"
+            android:textColorHint="#546E7A"
             app:layout_constraintBottom_toTopOf="@id/CorreoTexto"
-            tools:ignore="LabelFor,SpeakableTextPresentCheck,VisualLintTextFieldSize" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:ignore="HardcodedText" />
 
         <TextView
             android:id="@+id/CorreoTexto"
@@ -56,13 +57,14 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:autofillHints=""
-            android:minHeight="48dp"
-            android:background="@android:color/darker_gray"
+            android:hint="Ingresa tu correo"
             android:inputType="text"
-            app:layout_constraintTop_toBottomOf="@id/CorreoTexto"
-            app:layout_constraintStart_toStartOf="parent"
+            android:minHeight="48dp"
+            android:textColorHint="#546E7A"
             app:layout_constraintEnd_toEndOf="parent"
-            tools:ignore="LabelFor,SpeakableTextPresentCheck,VisualLintTextFieldSize" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/CorreoTexto"
+            tools:ignore="HardcodedText" />
 
         <TextView
             android:id="@+id/ContraseñaTexto"
@@ -79,16 +81,17 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:autofillHints=""
+            android:hint="Ingresa tu contraseña"
+            android:inputType="textPassword"
             android:minHeight="48dp"
-            android:background="@android:color/darker_gray"
-            android:inputType="text"
-            app:layout_constraintTop_toBottomOf="@id/ContraseñaTexto"
-            app:layout_constraintStart_toStartOf="parent"
+            android:textColorHint="#546E7A"
             app:layout_constraintEnd_toEndOf="parent"
-            tools:ignore="LabelFor,SpeakableTextPresentCheck,VisualLintTextFieldSize" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ContraseñaTexto"
+            tools:ignore="HardcodedText" />
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/BotonIniciarSesion"
+            android:id="@+id/BotonRegistrar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="100dp"
@@ -96,6 +99,7 @@
             app:layout_constraintTop_toBottomOf="@id/BarraContraseña"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            tools:ignore="HardcodedText,VisualLintButtonSize" />
+            tools:ignore="HardcodedText" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

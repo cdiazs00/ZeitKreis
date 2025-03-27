@@ -1,12 +1,11 @@
 [versions]
-agp = "8.9.0"
-groovyAll = "3.0.9"
+agp = "8.9.1"
 jakartaPersistenceApi = "3.1.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 appcompat = "1.7.0"
-loggingInterceptor = "4.9.0"
+loggingInterceptor = "4.9.1"
 material = "1.12.0"
 activity = "1.10.1"
 constraintlayout = "2.2.1"
@@ -17,7 +16,6 @@ retrofit = "2.9.0"
 
 [libraries]
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
-groovy-all = { module = "org.codehaus.groovy:groovy-all", version.ref = "groovyAll" }
 jakarta-persistence-api = { module = "jakarta.persistence:jakarta.persistence-api", version.ref = "jakartaPersistenceApi" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -34,4 +32,3 @@ retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version = "1.9.0" }

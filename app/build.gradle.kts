@@ -15,6 +15,12 @@ val dbUrl: String = System.getenv("DB_URL") ?: localProperties.getProperty("DB_U
 val dbUser: String = System.getenv("DB_USER") ?: localProperties.getProperty("DB_USER", "")
 val dbPassword: String = System.getenv("DB_PASSWORD") ?: localProperties.getProperty("DB_PASSWORD", "")
 
+configurations.all {
+    resolutionStrategy {
+        force("org.codehaus.groovy:groovy:3.0.9")
+    }
+}
+
 android {
     namespace = "com.example.zeitkreis"
     compileSdk = 35
@@ -60,7 +66,6 @@ dependencies {
     implementation(libs.appcompat)
     implementation(libs.converter.gson)
     implementation(libs.constraintlayout)
-    implementation(libs.groovy.all)
     implementation(libs.jakarta.persistence.api)
     implementation(libs.logging.interceptor)
     implementation(libs.material)

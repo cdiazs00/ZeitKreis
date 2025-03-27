@@ -6,7 +6,7 @@
     android:id="@+id/login"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".IniciarSesión">
+    tools:context=".IniciarSesion">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/groupContainer"
@@ -27,17 +27,19 @@
             tools:ignore="HardcodedText" />
 
         <EditText
-            android:background="@android:color/darker_gray"
+            android:background="?android:attr/editTextBackground"
+            android:hint="Ingresa tu nombre"
             android:id="@+id/BarraCorreo"
             android:importantForAutofill="no"
             android:inputType="textEmailAddress"
             android:layout_height="wrap_content"
             android:layout_width="300dp"
             android:minHeight="48dp"
+            android:textColorHint="#546E7A"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/CorreoTexto"
-            tools:ignore="LabelFor,SpeakableTextPresentCheck,VisualLintTextFieldSize" />
+            tools:ignore="HardcodedText,LabelFor,SpeakableTextPresentCheck,VisualLintTextFieldSize" />
 
         <TextView
             android:id="@+id/ContraseñaTexto"
@@ -50,17 +52,19 @@
             tools:ignore="HardcodedText" />
 
         <EditText
-            android:background="@android:color/darker_gray"
+            android:background="?android:attr/editTextBackground"
+            android:hint="Ingresa tu contraseña"
             android:id="@+id/BarraContraseña"
             android:importantForAutofill="no"
             android:inputType="textPassword"
             android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:minHeight="48dp"
+            android:textColorHint="#546E7A"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/ContraseñaTexto"
-            tools:ignore="LabelFor,SpeakableTextPresentCheck,VisualLintTextFieldSize" />
+            tools:ignore="HardcodedText,LabelFor,SpeakableTextPresentCheck,VisualLintTextFieldSize" />
 
         <TextView
             android:id="@+id/ContraseñaOlvidadaTexto"

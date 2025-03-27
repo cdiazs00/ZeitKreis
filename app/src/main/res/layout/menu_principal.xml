@@ -19,44 +19,52 @@
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/BotonAgenda"
-            android:layout_height="150dp"
             android:layout_width="150dp"
-            android:text="AG"
-            android:textSize="50sp"
+            android:layout_height="150dp"
+            android:background="@drawable/agenda"
+            android:text="Agenda"
+            android:textColor="@color/white"
+            android:textSize="38sp"
             app:layout_constraintEnd_toStartOf="@id/BotonCalendario"
             app:layout_constraintStart_toStartOf="parent"
-            tools:ignore="HardcodedText,MissingConstraints" />
+            tools:ignore="HardcodedText,MissingConstraints,SpeakableTextPresentCheck,TextSizeCheck" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/BotonCalendario"
             android:layout_width="150dp"
             android:layout_height="150dp"
-            android:text="CA"
-            android:textSize="50sp"
+            android:background="@drawable/calendario"
+            android:text="Calendario general"
+            android:textColor="@color/white"
+            android:textSize="24sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/BotonAgenda"
-            tools:ignore="HardcodedText,MissingConstraints,DuplicateClickableBoundsCheck" />
+            tools:ignore="HardcodedText,MissingConstraints,DuplicateClickableBoundsCheck,SpeakableTextPresentCheck,TextSizeCheck,TextContrastCheck" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/BotonAmigos"
-            android:layout_height="150dp"
             android:layout_width="150dp"
+            android:layout_height="150dp"
             android:layout_marginTop="50dp"
-            android:text="AM"
-            android:textSize="50sp"
-            app:layout_constraintTop_toBottomOf="@id/BotonAgenda"
+            android:background="@drawable/amigos"
+            android:text="Amigos"
+            android:textColor="@color/white"
+            android:textSize="38sp"
             app:layout_constraintStart_toStartOf="@id/BotonAgenda"
-            tools:ignore="HardcodedText,MissingConstraints" />
+            app:layout_constraintTop_toBottomOf="@id/BotonAgenda"
+            tools:ignore="HardcodedText,MissingConstraints,SpeakableTextPresentCheck,TextSizeCheck" />
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/BotonDesconocido2"
-            android:layout_height="150dp"
+            android:id="@+id/BotonAjustes"
             android:layout_width="150dp"
+            android:layout_height="150dp"
             android:layout_marginTop="50dp"
-            android:text="2"
-            android:textSize="50sp"
-            app:layout_constraintTop_toBottomOf="@id/BotonCalendario"
+            android:background="@drawable/ajustes"
+            android:text="Ajustes y Perfil"
+            android:textColor="@color/white"
+            android:textSize="29sp"
             app:layout_constraintStart_toStartOf="@id/BotonCalendario"
-            tools:ignore="HardcodedText,MissingConstraints" />
+            app:layout_constraintTop_toBottomOf="@id/BotonCalendario"
+            tools:ignore="HardcodedText,MissingConstraints,SpeakableTextPresentCheck,TextSizeCheck" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
