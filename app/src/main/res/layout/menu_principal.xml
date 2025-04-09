@@ -22,9 +22,9 @@
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:background="@drawable/agenda"
-            android:text="Agenda"
+            android:text="Agendas"
             android:textColor="@color/white"
-            android:textSize="38sp"
+            android:textSize="32sp"
             app:layout_constraintEnd_toStartOf="@id/BotonCalendario"
             app:layout_constraintStart_toStartOf="parent"
             tools:ignore="HardcodedText,MissingConstraints,SpeakableTextPresentCheck,TextSizeCheck" />

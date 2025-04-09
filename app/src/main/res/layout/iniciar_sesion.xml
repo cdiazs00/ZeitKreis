@@ -21,14 +21,14 @@
             android:id="@+id/CorreoTexto"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:text="Nombre de usuario:"
+            android:text="Correo electrónico:"
             app:layout_constraintStart_toStartOf="@id/BarraCorreo"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="HardcodedText" />
 
         <EditText
             android:background="?android:attr/editTextBackground"
-            android:hint="Ingresa tu nombre"
+            android:hint="Ingresa tu correo electrónico"
             android:id="@+id/BarraCorreo"
             android:importantForAutofill="no"
             android:inputType="textEmailAddress"

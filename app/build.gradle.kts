@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 import java.util.Properties
 
 plugins {
@@ -14,12 +16,6 @@ val localProperties = Properties().apply {
 val dbUrl: String = System.getenv("DB_URL") ?: localProperties.getProperty("DB_URL", "")
 val dbUser: String = System.getenv("DB_USER") ?: localProperties.getProperty("DB_USER", "")
 val dbPassword: String = System.getenv("DB_PASSWORD") ?: localProperties.getProperty("DB_PASSWORD", "")
-
-configurations.all {
-    resolutionStrategy {
-        force("org.codehaus.groovy:groovy:3.0.9")
-    }
-}
 
 android {
     namespace = "com.example.zeitkreis"
@@ -53,9 +49,15 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+    }
+
+    packagingOptions {
+        exclude ("META-INF/INDEX.LIST")
+        exclude("META-INF/io.netty.versions.properties")
     }
 }
 
@@ -71,7 +73,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
-    implementation(libs.postgresql)
+    implementation(libs.pgjdbc.ng)
     implementation(libs.retrofit)
     testImplementation(libs.junit)
 }

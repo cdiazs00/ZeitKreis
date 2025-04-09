@@ -3,17 +3,17 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/calendarioAgenda"
-        android:icon="@drawable/circle"
+        android:icon="@drawable/calendario_2"
         android:title="Calendario"
         tools:ignore="HardcodedText" />
     <item
         android:id="@+id/chatAgenda"
-        android:icon="@drawable/circle"
+        android:icon="@drawable/chat"
         android:title="Chat"
         tools:ignore="HardcodedText" />
     <item
         android:id="@+id/miembrosAgenda"
-        android:icon="@drawable/circle"
+        android:icon="@drawable/miembros"
         android:title="Miembros"
         tools:ignore="HardcodedText" />
 
