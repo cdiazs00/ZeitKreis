@@ -1,4 +1,4 @@
-package com.example.zeitkreis;
+package APIs;
 
 import com.google.gson.annotations.SerializedName;
 

@@ -1,4 +1,4 @@
-package com.example.zeitkreis;
+package APIs;
 
 public class LoginResponse {
     private boolean success;
