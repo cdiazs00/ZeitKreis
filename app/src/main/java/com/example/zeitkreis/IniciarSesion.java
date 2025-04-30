@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -22,24 +23,36 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class IniciarSesion extends AppCompatActivity {
 
     private EditText barraCorreo, barraContrasena;
-    private Users usuarioApi;
+    private Users usuariosApi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        SharedPreferences preferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+        String email = preferences.getString("email", null);
+
+        if (email != null) {
+            Intent intent = new Intent(this, MenuPrincipal.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
+
         setContentView(R.layout.iniciar_sesion);
 
         barraCorreo = findViewById(R.id.BarraCorreo);
         barraContrasena = findViewById(R.id.BarraContraseña);
         Button iniciarSesion = findViewById(R.id.BotonIniciarSesion);
         Button registrarse = findViewById(R.id.BotonRegistrarse);
+        TextView cambiarContrasena = findViewById(R.id.ContraseñaOlvidadaTexto);
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://10.0.2.2:8080/usuarios/")
+                .baseUrl("http://10.0.2.2:8080/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        usuarioApi = retrofit.create(Users.class);
+        usuariosApi = retrofit.create(Users.class);
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -63,12 +76,18 @@ public class IniciarSesion extends AppCompatActivity {
             startActivity(intent);
             finish();
         });
+
+        cambiarContrasena.setOnClickListener(v -> {
+            Intent intent = new Intent(IniciarSesion.this, CambiarContraseña.class);
+            startActivity(intent);
+            finish();
+        });
     }
 
     private void verificarUsuario(String correo, String password) {
         LoginRequest request = new LoginRequest(correo, password);
 
-        Call<LoginResponse> call = usuarioApi.loginUsuario(request);
+        Call<LoginResponse> call = usuariosApi.loginUsuario(request);
         call.enqueue(new Callback<>() {
             @Override
             public void onResponse(@NonNull Call<LoginResponse> call, @NonNull Response<LoginResponse> response) {

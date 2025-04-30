@@ -1,64 +1,178 @@
 package com.example.zeitkreis;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import androidx.fragment.app.Fragment;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import java.util.*;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link CrearAgenda#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class CrearAgenda extends Fragment {
+import APIs.NewDiaryRequest;
+import APIs.NewDiaryResponse;
+import APIs.UserSearchRequest;
+import APIs.UserSearchResponse;
+import retrofit2.*;
+import retrofit2.converter.gson.GsonConverterFactory;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+public class CrearAgenda extends AppCompatActivity {
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private AutoCompleteTextView barraMiembros;
+    private EditText campoNombreAgenda;
+    private TextView miembrosSeleccionados;
+    private Diaries agendaApi;
 
-    public CrearAgenda() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment CrearAgenda.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static CrearAgenda newInstance(String param1, String param2) {
-        CrearAgenda fragment = new CrearAgenda();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+    private String usuarioActivo = "nombreUsuario";
+    private final List<Long> idMiembros = new ArrayList<>();
+    private final Map<String, Long> nombreAIdMap = new HashMap<>();
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+        setContentView(R.layout.crear_agenda);
+
+        barraMiembros = findViewById(R.id.BarraMiembros);
+        campoNombreAgenda = findViewById(R.id.BarraNombre);
+        miembrosSeleccionados = findViewById(R.id.MiembrosSeleccionados);
+        Button botonCrearAgenda = findViewById(R.id.BotonCrearAgenda);
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://10.0.2.2:8080/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        agendaApi = retrofit.create(Diaries.class);
+
+        barraMiembros.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, new String[]{}));
+        barraMiembros.setThreshold(1);
+
+        barraMiembros.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void afterTextChanged(Editable s) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.length() >= 1) {
+                    buscarYActualizarSugerencias(s.toString());
+                }
+            }
+        });
+
+        barraMiembros.setOnItemClickListener((parent, view, position, id) -> {
+            String miembroSeleccionado = parent.getItemAtPosition(position).toString();
+            if (!miembroSeleccionado.isEmpty()) {
+                agregarMiembro(miembroSeleccionado);
+                barraMiembros.setText("");
+                actualizarMiembrosSeleccionados();
+            }
+        });
+
+        botonCrearAgenda.setOnClickListener(v -> {
+            String nombreAgenda = campoNombreAgenda.getText().toString().trim();
+
+            if (nombreAgenda.isEmpty() || idMiembros.isEmpty()) {
+                Toast.makeText(this, "Ingresa un nombre y al menos un miembro", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            crearNuevaAgenda(nombreAgenda);
+        });
+    }
+
+    private void buscarYActualizarSugerencias(String query) {
+        UserSearchRequest request = new UserSearchRequest(query);
+
+        agendaApi.buscarUsuarios(request).enqueue(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<UserSearchResponse> call, @NonNull Response<UserSearchResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    List<UserSearchResponse.Usuario> usuarios = response.body().getUsuarios();
+                    List<String> nombres = new ArrayList<>();
+
+                    for (UserSearchResponse.Usuario usuario : usuarios) {
+                        nombreAIdMap.put(usuario.getNombreUsuario(), usuario.getId());
+                        nombres.add(usuario.getNombreUsuario());
+                    }
+
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(CrearAgenda.this,
+                            android.R.layout.simple_dropdown_item_1line, nombres);
+                    barraMiembros.setAdapter(adapter);
+                    adapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<UserSearchResponse> call, @NonNull Throwable t) {
+                Toast.makeText(CrearAgenda.this, "Error al buscar usuarios", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void agregarMiembro(String nombreUsuario) {
+        if (!nombreAIdMap.containsKey(nombreUsuario)) {
+            Toast.makeText(this, "No se encontró el ID de " + nombreUsuario, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Long id = nombreAIdMap.get(nombreUsuario);
+        if (!idMiembros.contains(id)) {
+            idMiembros.add(id);
+            Toast.makeText(this, nombreUsuario + " agregado", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, nombreUsuario + " ya está en la lista", Toast.LENGTH_SHORT).show();
         }
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.crear_agenda, container, false);
+    private void actualizarMiembrosSeleccionados() {
+        StringBuilder miembrosText = new StringBuilder("Miembros: ");
+        for (Long id : idMiembros) {
+            String nombre = getNombreMiembro(id);
+            miembrosText.append(nombre).append(", ");
+        }
+        miembrosSeleccionados.setText(miembrosText.toString());
+    }
+
+    private String getNombreMiembro(Long id) {
+        return nombreAIdMap.entrySet().stream()
+                .filter(entry -> entry.getValue().equals(id))
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse("Desconocido");
+    }
+
+    private void crearNuevaAgenda(String nombreAgenda) {
+        NewDiaryRequest request = new NewDiaryRequest(nombreAgenda, idMiembros);
+
+        agendaApi.crearAgenda(request).enqueue(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<NewDiaryResponse> call, @NonNull Response<NewDiaryResponse> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(CrearAgenda.this, "Agenda creada exitosamente", Toast.LENGTH_SHORT).show();
+                    finish();
+                } else {
+                    Toast.makeText(CrearAgenda.this, "Error al crear la agenda", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<NewDiaryResponse> call, @NonNull Throwable t) {
+                Toast.makeText(CrearAgenda.this, "Fallo de conexión: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public String getUsuarioActivo() {
+        return usuarioActivo;
+    }
+
+    public void setUsuarioActivo(String usuarioActivo) {
+        this.usuarioActivo = usuarioActivo;
     }
 }

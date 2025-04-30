@@ -55,6 +55,15 @@
         <activity
             android:name=".Perfil" />
 
+        <activity
+            android:name=".AjustesGenerales" />
+
+        <activity
+            android:name=".CambiarContraseña" />
+
+        <activity
+            android:name=".CrearAgenda" />
+
     </application>
 
 </manifest>

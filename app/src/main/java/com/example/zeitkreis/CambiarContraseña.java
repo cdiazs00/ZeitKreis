@@ -11,28 +11,28 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import APIs.RegisterResponse;
-import APIs.RegisterRequest;
+import APIs.NewPasswordRequest;
+import APIs.NewPasswordResponse;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class Registro extends AppCompatActivity {
+public class CambiarContraseña extends AppCompatActivity {
 
-    private EditText barraNombre, barraCorreo, barraContrasena;
+    private EditText barraCorreo, barraContrasena, barraCambiarContrasena;
     private Users usuariosApi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.registro);
+        setContentView(R.layout.cambiar_contrasena);
 
-        barraNombre = findViewById(R.id.BarraNombre);
         barraCorreo = findViewById(R.id.BarraCorreo);
         barraContrasena = findViewById(R.id.BarraContraseña);
-        Button registrarse = findViewById(R.id.BotonRegistrar);
+        barraCambiarContrasena = findViewById(R.id.BarraNuevaContraseña);
+        Button cambiarContrasena = findViewById(R.id.BotonCambiarContrasena);
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://10.0.2.2:8080/")
@@ -43,46 +43,45 @@ public class Registro extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            barraNombre.setText(extras.getString("nombreUsuario", ""));
             barraCorreo.setText(extras.getString("email", ""));
             barraContrasena.setText(extras.getString("password", ""));
         }
 
-        registrarse.setOnClickListener(v -> {
-            String nombre = barraNombre.getText().toString().trim();
+        cambiarContrasena.setOnClickListener(v -> {
             String correo = barraCorreo.getText().toString().trim();
             String password = barraContrasena.getText().toString().trim();
+            String newPassword = barraCambiarContrasena.getText().toString().trim();
 
-            if (!nombre.isEmpty() && !correo.isEmpty() && !password.isEmpty()) {
-                UsuarioUnico(nombre, correo, password);
+            if (!correo.isEmpty() && !password.isEmpty() && !newPassword.isEmpty()) {
+                nuevaContraseña(correo, password, newPassword);
             } else {
-                Toast.makeText(Registro.this, "Faltan credenciales", Toast.LENGTH_SHORT).show();
+                Toast.makeText(CambiarContraseña.this, "Faltan credenciales", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void UsuarioUnico(String nombre, String correo, String password) {
-        RegisterRequest request = new RegisterRequest(nombre, correo, password);
+    private void nuevaContraseña(String correo, String password, String newPassword) {
+        NewPasswordRequest request = new NewPasswordRequest(correo, password, newPassword);
 
-        Call<RegisterResponse> call = usuariosApi.registrarUsuario(request);
+        Call<NewPasswordResponse> call = usuariosApi.cambiarContrasena(request);
         call.enqueue(new Callback<>() {
             @Override
-            public void onResponse(@NonNull Call<RegisterResponse> call, @NonNull Response<RegisterResponse> response) {
+            public void onResponse(@NonNull Call<NewPasswordResponse> call, @NonNull Response<NewPasswordResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     boolean resultado = response.body().isSuccess();
                     if (resultado) {
                         guardarUsuarioEnSesion(correo);
-                        Intent intent = new Intent(Registro.this, MenuPrincipal.class);
+                        Intent intent = new Intent(CambiarContraseña.this, MenuPrincipal.class);
                         startActivity(intent);
                         finish();
                     } else {
-                        Toast.makeText(Registro.this, "Este usuario ya está registrado", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(CambiarContraseña.this, "La contraseña actual es incorrecta", Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     try {
                         assert response.errorBody() != null;
                         String errorBody = response.errorBody().string();
-                        Toast.makeText(Registro.this, "Error: " + errorBody, Toast.LENGTH_LONG).show();
+                        Toast.makeText(CambiarContraseña.this, "Error: " + errorBody, Toast.LENGTH_LONG).show();
                         System.out.println("Error body: " + errorBody);
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -91,8 +90,8 @@ public class Registro extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(@NonNull Call<RegisterResponse> call, @NonNull Throwable t) {
-                Toast.makeText(Registro.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            public void onFailure(@NonNull Call<NewPasswordResponse> call, @NonNull Throwable t) {
+                Toast.makeText(CambiarContraseña.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                 t.printStackTrace();
             }
         });

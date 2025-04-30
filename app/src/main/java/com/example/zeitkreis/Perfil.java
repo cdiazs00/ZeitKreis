@@ -14,18 +14,10 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 public class Perfil extends AppCompatActivity {
 
     private TextView nombreUsuario, correoUsuario;
     private ImageView imagenPerfil;
-    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     @SuppressLint("WrongViewCast")
     @Override
@@ -46,45 +38,20 @@ public class Perfil extends AppCompatActivity {
         cargarImagenPerfil();
 
         ajustesGenerales.setOnClickListener(v -> Toast.makeText(this, "Ajustes Generales", Toast.LENGTH_SHORT).show());
-
         ajustesCuenta.setOnClickListener(v -> Toast.makeText(this, "Ajustes de Cuenta", Toast.LENGTH_SHORT).show());
-
         cerrarSesion.setOnClickListener(v -> cerrarSesion());
     }
 
     private void cargarDatosUsuario() {
         SharedPreferences preferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
         String correo = preferences.getString("correo", "");
+        String nombre = preferences.getString("nombre", "");
 
-        if (!correo.isEmpty()) {
-            executorService.execute(() -> {
-                try {
-                    Class.forName("org.postgresql.Driver");
-
-                    String dbUrl = ConfigUtil.getMetaData(getApplicationContext(), "DB_URL");
-                    String dbUser = ConfigUtil.getMetaData(getApplicationContext(), "DB_USER");
-                    String dbPassword = ConfigUtil.getMetaData(getApplicationContext(), "DB_PASSWORD");
-
-                    try (Connection connection = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
-                         PreparedStatement statement = connection.prepareStatement(
-                                 "SELECT Nombre FROM usuarios WHERE Correo_Electrónico = ?")) {
-
-                        statement.setString(1, correo);
-                        try (ResultSet resultSet = statement.executeQuery()) {
-                            if (resultSet.next()) {
-                                String nombre = resultSet.getString("Nombre");
-                                runOnUiThread(() -> {
-                                    nombreUsuario.setText(nombre);
-                                    correoUsuario.setText(correo);
-                                });
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    runOnUiThread(() -> Toast.makeText(Perfil.this, "Error al cargar los datos", Toast.LENGTH_SHORT).show());
-                }
-            });
+        if (!correo.isEmpty() && !nombre.isEmpty()) {
+            nombreUsuario.setText(nombre);
+            correoUsuario.setText(correo);
+        } else {
+            Toast.makeText(this, "Datos de usuario no disponibles", Toast.LENGTH_SHORT).show();
         }
     }
 
