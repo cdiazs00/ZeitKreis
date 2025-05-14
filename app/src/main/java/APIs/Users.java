@@ -1,11 +1,11 @@
-package com.example.zeitkreis;
+package APIs;
 
-import APIs.LoginRequest;
-import APIs.LoginResponse;
-import APIs.NewPasswordRequest;
-import APIs.NewPasswordResponse;
-import APIs.RegisterRequest;
-import APIs.RegisterResponse;
+import Requests_Responses.LoginRequest;
+import Requests_Responses.LoginResponse;
+import Requests_Responses.NewPasswordRequest;
+import Requests_Responses.NewPasswordResponse;
+import Requests_Responses.RegisterRequest;
+import Requests_Responses.RegisterResponse;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;

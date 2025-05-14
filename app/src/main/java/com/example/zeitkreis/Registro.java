@@ -11,8 +11,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import APIs.RegisterResponse;
-import APIs.RegisterRequest;
+import APIs.Users;
+import Requests_Responses.RegisterResponse;
+import Requests_Responses.RegisterRequest;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;

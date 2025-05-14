@@ -15,10 +15,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.*;
 
-import APIs.NewDiaryRequest;
-import APIs.NewDiaryResponse;
-import APIs.UserSearchRequest;
-import APIs.UserSearchResponse;
+import APIs.Diaries;
+import Requests_Responses.NewDiaryRequest;
+import Requests_Responses.NewDiaryResponse;
+import Requests_Responses.UserSearchRequest;
+import Requests_Responses.UserSearchResponse;
 import retrofit2.*;
 import retrofit2.converter.gson.GsonConverterFactory;
 

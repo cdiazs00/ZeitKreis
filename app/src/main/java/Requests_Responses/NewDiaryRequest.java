@@ -1,4 +1,4 @@
-package APIs;
+package Requests_Responses;
 
 import java.util.List;
 

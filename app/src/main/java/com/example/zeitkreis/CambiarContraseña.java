@@ -11,8 +11,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import APIs.NewPasswordRequest;
-import APIs.NewPasswordResponse;
+import APIs.Users;
+import Requests_Responses.NewPasswordRequest;
+import Requests_Responses.NewPasswordResponse;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;

@@ -12,8 +12,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import APIs.LoginRequest;
-import APIs.LoginResponse;
+import APIs.Users;
+import Requests_Responses.LoginRequest;
+import Requests_Responses.LoginResponse;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -94,7 +95,8 @@ public class IniciarSesion extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     boolean resultado = response.body().isSuccess();
                     if (resultado) {
-                        guardarUsuarioEnSesion(correo);
+                        String nombreUsuario = response.body().getNombreUsuario();
+                        guardarUsuarioEnSesion(correo, nombreUsuario);
                         Intent intent = new Intent(IniciarSesion.this, MenuPrincipal.class);
                         startActivity(intent);
                         finish();
@@ -121,10 +123,11 @@ public class IniciarSesion extends AppCompatActivity {
         });
     }
 
-    private void guardarUsuarioEnSesion(String correo) {
+    private void guardarUsuarioEnSesion(String correo, String nombreUsuario) {
         SharedPreferences preferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("email", correo);
+        editor.putString("nombre_usuario", nombreUsuario);
         editor.apply();
     }
 }

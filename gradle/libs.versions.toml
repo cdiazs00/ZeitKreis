@@ -1,5 +1,6 @@
 [versions]
 agp = "8.9.2"
+gson = "2.10.1"
 jakartaPersistenceApi = "3.1.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -17,6 +18,7 @@ retrofit = "2.9.0"
 
 [libraries]
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 jakarta-persistence-api = { module = "jakarta.persistence:jakarta.persistence-api", version.ref = "jakartaPersistenceApi" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

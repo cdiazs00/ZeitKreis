@@ -64,6 +64,10 @@
         <activity
             android:name=".CrearAgenda" />
 
+        <activity
+            android:name=".AgendaFragments"
+            tools:ignore="Instantiatable" />
+
     </application>
 
 </manifest>

@@ -68,6 +68,7 @@ dependencies {
     implementation(libs.appcompat)
     implementation(libs.converter.gson)
     implementation(libs.constraintlayout)
+    implementation(libs.gson)
     implementation(libs.jakarta.persistence.api)
     implementation(libs.logging.interceptor)
     implementation(libs.material)

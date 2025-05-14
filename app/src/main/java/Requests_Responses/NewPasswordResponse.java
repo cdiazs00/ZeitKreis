@@ -1,6 +1,6 @@
-package APIs;
+package Requests_Responses;
 
-public class RegisterResponse {
+public class NewPasswordResponse {
     private boolean success;
 
     public boolean isSuccess() {

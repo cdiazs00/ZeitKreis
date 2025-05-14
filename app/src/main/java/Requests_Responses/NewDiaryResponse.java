@@ -1,4 +1,4 @@
-package APIs;
+package Requests_Responses;
 
 public class NewDiaryResponse {
     private boolean success;

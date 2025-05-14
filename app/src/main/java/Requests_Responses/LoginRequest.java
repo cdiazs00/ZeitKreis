@@ -1,25 +1,17 @@
-package APIs;
+package Requests_Responses;
 
 import com.google.gson.annotations.SerializedName;
 
-public class RegisterRequest {
-    @SerializedName("nombreUsuario")
-    private String nombre;
-
+public class LoginRequest {
     @SerializedName("email")
     private String email;
 
     @SerializedName("password")
     private String contraseña;
 
-    public RegisterRequest(String nombre, String email, String contraseña) {
-        this.nombre = nombre;
+    public LoginRequest(String email, String contraseña) {
         this.email = email;
         this.contraseña = contraseña;
-    }
-
-    public String getNombre() {
-        return nombre;
     }
 
     public String getEmail() {
@@ -28,10 +20,6 @@ public class RegisterRequest {
 
     public String getContraseña() {
         return contraseña;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
     }
 
     public void setEmail(String email) {

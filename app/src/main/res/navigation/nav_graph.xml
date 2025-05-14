@@ -2,17 +2,41 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/calendarioAgenda">
-    <fragment
-        android:id="@+id/calendarioAgenda"
-        android:name="com.example.zeitkreis.CalendarioAgenda"
-        android:label="CalendarioAgenda" />
+    app:startDestination="@id/chat">
+
     <fragment
         android:id="@+id/chat"
         android:name="com.example.zeitkreis.Chat"
-        android:label="Chat" />
+        android:label="Chat" >
+        <action
+            android:id="@+id/action_chat_to_calendarioAgenda"
+            app:destination="@id/calendarioAgenda" />
+        <action
+            android:id="@+id/action_chat_to_miembros"
+            app:destination="@id/miembros" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/calendarioAgenda"
+        android:name="com.example.zeitkreis.CalendarioAgenda"
+        android:label="CalendarioAgenda" >
+        <action
+            android:id="@+id/action_calendarioAgenda_to_miembros"
+            app:destination="@id/miembros" />
+        <action
+            android:id="@+id/action_calendarioAgenda_to_chat2"
+            app:destination="@id/chat" />
+    </fragment>
+
     <fragment
         android:id="@+id/miembros"
         android:name="com.example.zeitkreis.Miembros"
-        android:label="Miembros" />
+        android:label="Miembros" >
+        <action
+            android:id="@+id/action_miembros_to_chat"
+            app:destination="@id/chat" />
+        <action
+            android:id="@+id/action_miembros_to_calendarioAgenda"
+            app:destination="@id/calendarioAgenda" />
+    </fragment>
 </navigation>

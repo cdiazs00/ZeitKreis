@@ -1,35 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_agendas"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
     tools:context=".Agendas"
     tools:ignore="VisualLintBounds">
 
-    <LinearLayout
+    <ListView
+        android:id="@+id/chat_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:divider="@android:color/darker_gray"
+        android:dividerHeight="1dp"/>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/crear_agenda"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="@color/black"
+        android:text="Crear Agenda"
+        android:textColor="@color/white"
+        tools:ignore="HardcodedText,VisualLintButtonSize" />
+
+    <FrameLayout
+        android:id="@+id/chat"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:visibility="gone"
+        />
 
-        <ListView
-            android:id="@+id/chat_list_view"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:divider="@android:color/darker_gray"
-            android:dividerHeight="1dp"/>
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:backgroundTint="@color/black"
-            android:id="@+id/crear_agenda"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Crear Agenda"
-            android:textColor="@color/white"
-            android:layout_marginTop="8dp"
-            tools:ignore="HardcodedText,VisualLintButtonSize" />
-    </LinearLayout>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:visibility="gone" />
+</LinearLayout>
