@@ -1,6 +1,7 @@
 package com.example.zeitkreis;
 
 import android.annotation.SuppressLint;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,7 @@ import Requests_Responses.MessageResponse;
 public class MensajeAdaptador extends RecyclerView.Adapter<MensajeAdaptador.MensajeViewHolder> {
 
     private final List<MessageResponse> mensajes;
+    private static final String TAG = "MensajeAdaptador";
 
     public MensajeAdaptador(List<MessageResponse> mensajes) {
         this.mensajes = mensajes;
@@ -40,30 +42,48 @@ public class MensajeAdaptador extends RecyclerView.Adapter<MensajeAdaptador.Mens
         holder.texto.setText(mensaje.getTexto());
         holder.autor.setText(mensaje.getAutor());
 
-        String timestamp = mensaje.getTimestamp();
+        String timestampString = mensaje.getTimestamp();
+        Log.d(TAG, "Procesando timestamp string: " + timestampString + " para mensaje: " + mensaje.getTexto()); // Log del string original
         Date date = null;
 
-        String[] possibleFormats = {
-                "yyyy-MM-dd HH:mm:ss",
-                "yyyy-MM-dd'T'HH:mm:ss'Z'",
-                "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
-                "yyyy-MM-dd HH:mm:ss.SSS"
-        };
+        try {
+            long millis = Long.parseLong(timestampString);
+            date = new Date(millis);
+            Log.d(TAG, "Timestamp parseado como long (millis): " + millis);
+        } catch (NumberFormatException e) {
+            Log.d(TAG, "Timestamp no es un long, intentando formatos de fecha string.");
+            String[] possibleFormats = {
+                    "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
+                    "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+                    "yyyy-MM-dd'T'HH:mm:ss'Z'",
+                    "yyyy-MM-dd'T'HH:mm:ss",
+                    "yyyy-MM-dd HH:mm:ss.SSS",
+                    "yyyy-MM-dd HH:mm:ss"
+            };
 
-        for (String format : possibleFormats) {
-            try {
-                SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.getDefault());
-                sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-                date = sdf.parse(timestamp);
-                if (date != null) break;
-            } catch (ParseException ignored) {
+            for (String formatPattern : possibleFormats) {
+                try {
+                    SimpleDateFormat sdf = new SimpleDateFormat(formatPattern, Locale.US);
+
+                    if (formatPattern.endsWith("'Z'")) {
+                        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+                    }
+
+                    date = sdf.parse(timestampString);
+                    if (date != null) {
+                        Log.d(TAG, "Timestamp '" + timestampString + "' parseado con formato: " + formatPattern);
+                        break;
+                    }
+                } catch (ParseException ignored) {}
             }
         }
+
 
         if (date != null) {
             SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
             holder.timestamp.setText(outputFormat.format(date));
         } else {
+            Log.w(TAG, "No se pudo parsear el timestamp: " + timestampString + ". Mostrando 'Fecha no válida'.");
             holder.timestamp.setText("Fecha no válida");
         }
     }
@@ -82,10 +102,5 @@ public class MensajeAdaptador extends RecyclerView.Adapter<MensajeAdaptador.Mens
             autor = itemView.findViewById(R.id.autorMensaje);
             timestamp = itemView.findViewById(R.id.timestampMensaje);
         }
-    }
-
-    public void agregarMensaje(MessageResponse mensaje) {
-        mensajes.add(mensaje);
-        notifyItemInserted(mensajes.size() - 1);
     }
 }

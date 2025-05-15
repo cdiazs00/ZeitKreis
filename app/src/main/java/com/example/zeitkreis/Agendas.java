@@ -2,119 +2,163 @@ package com.example.zeitkreis;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.*;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProvider;
 
 import java.util.*;
 
-import APIs.Diaries;
 import Requests_Responses.AllDiariesResponse;
-import retrofit2.*;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class Agendas extends AppCompatActivity {
 
-    private Diaries agendaApi;
-    private Button crearAgenda;
+    private AgendasViewModel viewModel;
+    private ListView listaAgendasView;
+    private ArrayAdapter<String> agendasAdapter;
+    private List<AllDiariesResponse.Agenda> currentAgendasList;
+    private Button crearAgendaButton;
+    private View fragmentContainer;
+
+    private static final String TAG = "AgendasActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.agendas);
 
-        ListView listaAgendas = findViewById(R.id.chat_list_view);
-        crearAgenda = findViewById(R.id.crear_agenda);
+        listaAgendasView = findViewById(R.id.chat_list_view);
+        crearAgendaButton = findViewById(R.id.crear_agenda);
+        fragmentContainer = findViewById(R.id.chat);
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://10.0.2.2:8080/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
+        currentAgendasList = new ArrayList<>();
+        agendasAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, new ArrayList<>());
+        listaAgendasView.setAdapter(agendasAdapter);
 
-        agendaApi = retrofit.create(Diaries.class);
+        viewModel = new ViewModelProvider(this).get(AgendasViewModel.class);
 
-        crearAgenda.setOnClickListener(v -> {
+        setupObservers();
+        setupListeners();
+
+        if (savedInstanceState == null) {
+            viewModel.fetchAgendas();
+        }
+
+        getSupportFragmentManager().addOnBackStackChangedListener(() -> {
+            if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
+                Log.d(TAG, "Back stack está vacío, mostrando lista de agendas.");
+                listaAgendasView.setVisibility(View.VISIBLE);
+                if (fragmentContainer != null) {
+                    fragmentContainer.setVisibility(View.GONE);
+                }
+                toggleCrearAgendaButton(true);
+            }
+        });
+    }
+
+    private void setupObservers() {
+        viewModel.agendasList.observe(this, agendas -> {
+            Log.d(TAG, "Lista de agendas actualizada. Número de agendas: " + (agendas != null ? agendas.size() : 0));
+            if (agendas != null) {
+                currentAgendasList.clear();
+                currentAgendasList.addAll(agendas);
+
+                List<String> nombresAgendas = new ArrayList<>();
+                for (AllDiariesResponse.Agenda agenda : agendas) {
+                    String nombre = agenda.getNombre() != null ? agenda.getNombre() : "(Sin nombre)";
+                    nombresAgendas.add(nombre);
+                }
+                agendasAdapter.clear();
+                agendasAdapter.addAll(nombresAgendas);
+                agendasAdapter.notifyDataSetChanged();
+            }
+        });
+
+        viewModel.errorMessage.observe(this, errorMsg -> {
+            if (errorMsg != null && !errorMsg.isEmpty()) {
+                Toast.makeText(Agendas.this, errorMsg, Toast.LENGTH_LONG).show();
+                viewModel._errorMessage.setValue(null);
+            }
+        });
+    }
+
+    private void setupListeners() {
+        crearAgendaButton.setOnClickListener(v -> {
             Intent intent = new Intent(Agendas.this, CrearAgenda.class);
             startActivity(intent);
         });
 
-        obtenerYMostrarAgendas(listaAgendas);
-    }
-
-    private void obtenerYMostrarAgendas(ListView listaAgendas) {
-        agendaApi.obtenerAgendas().enqueue(new Callback<>() {
-            @Override
-            public void onResponse(@NonNull Call<List<AllDiariesResponse.Agenda>> call, @NonNull Response<List<AllDiariesResponse.Agenda>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    List<AllDiariesResponse.Agenda> agendas = response.body();
-                    List<String> nombresAgendas = new ArrayList<>();
-                    for (AllDiariesResponse.Agenda agenda : agendas) {
-                        String nombre = agenda.getNombre() != null ? agenda.getNombre() : "(Sin nombre)";
-                        nombresAgendas.add(nombre);
-                    }
-
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                            Agendas.this,
-                            android.R.layout.simple_list_item_1,
-                            nombresAgendas
-                    );
-                    listaAgendas.setAdapter(adapter);
-
-                    listaAgendas.setOnItemClickListener((parent, view, position, id) -> {
-                        View container = findViewById(R.id.chat);
-                        if (container == null) {
-                            Toast.makeText(Agendas.this, "No se encontró el contenedor del fragmento.", Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-
-                        AllDiariesResponse.Agenda agendaSeleccionada = agendas.get(position);
-                        Long idAgenda = agendaSeleccionada.getId();
-                        String nombreAgenda = agendaSeleccionada.getNombre();
-
-                        AgendaFragments agendaFragments = new AgendaFragments();
-                        Bundle args = new Bundle();
-                        args.putLong("agendaId", idAgenda != null ? idAgenda : -1L);
-                        args.putString("agendaNombre", nombreAgenda != null ? nombreAgenda : "(Sin nombre)");
-                        agendaFragments.setArguments(args);
-
-                        toggleCrearAgendaButton(false);
-
-                        container.setVisibility(View.VISIBLE);
-                        listaAgendas.setVisibility(View.GONE);
-
-                        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                        transaction.replace(R.id.chat, agendaFragments);
-                        transaction.addToBackStack(null);
-                        transaction.commit();
-                    });
-
-                } else {
-                    Toast.makeText(Agendas.this, "Error al obtener agendas", Toast.LENGTH_SHORT).show();
-                }
+        listaAgendasView.setOnItemClickListener((parent, view, position, id) -> {
+            if (fragmentContainer == null) {
+                Toast.makeText(Agendas.this, "No se encontró el contenedor del fragmento.", Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "Contenedor R.id.chat es nulo.");
+                return;
             }
 
-            @Override
-            public void onFailure(@NonNull Call<List<AllDiariesResponse.Agenda>> call, @NonNull Throwable t) {
-                Toast.makeText(Agendas.this, "Fallo de conexión: " + t.getMessage(), Toast.LENGTH_LONG).show();
+            if (currentAgendasList != null && position < currentAgendasList.size()) {
+                AllDiariesResponse.Agenda agendaSeleccionada = currentAgendasList.get(position);
+                Long idAgenda = agendaSeleccionada.getId();
+                String nombreAgenda = agendaSeleccionada.getNombre();
+
+                Log.d(TAG, "Agenda seleccionada: " + nombreAgenda + " (ID: " + idAgenda + ")");
+
+                AgendaFragments agendaFragments = new AgendaFragments();
+                Bundle args = new Bundle();
+                args.putLong("agendaId", idAgenda != null ? idAgenda : -1L);
+                args.putString("agendaNombre", nombreAgenda != null ? nombreAgenda : "(Sin nombre)");
+                agendaFragments.setArguments(args);
+
+                toggleCrearAgendaButton(false);
+
+                fragmentContainer.setVisibility(View.VISIBLE);
+                listaAgendasView.setVisibility(View.GONE);
+
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.chat, agendaFragments);
+                transaction.addToBackStack("AgendaFragmentsTransaction");
+                transaction.commit();
+            } else {
+                Log.e(TAG, "Error: currentAgendasList es nulo o la posición está fuera de los límites.");
             }
         });
     }
 
+
     private void toggleCrearAgendaButton(boolean isVisible) {
-        if (crearAgenda != null) {
-            if (isVisible) {
-                crearAgenda.setVisibility(View.VISIBLE);
-            } else {
-                crearAgenda.setVisibility(View.INVISIBLE);
-            }
+        if (crearAgendaButton != null) {
+            crearAgendaButton.setVisibility(isVisible ? View.VISIBLE : View.INVISIBLE);
+            Log.d(TAG, "Botón Crear Agenda visibilidad: " + isVisible);
         }
     }
 
     @Override
     public void onBackPressed() {
+        if (fragmentContainer != null && fragmentContainer.getVisibility() == View.VISIBLE &&
+                getSupportFragmentManager().getBackStackEntryCount() > 0) {
+            Log.d(TAG, "onBackPressed: AgendaFragments está visible, dejando que el sistema lo maneje.");
+        } else {
+            Log.d(TAG, "onBackPressed: No hay fragmentos en el backstack o el contenedor no está visible. Comportamiento por defecto.");
+        }
         super.onBackPressed();
-        toggleCrearAgendaButton(true);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
+            listaAgendasView.setVisibility(View.VISIBLE);
+            if (fragmentContainer != null) {
+                fragmentContainer.setVisibility(View.GONE);
+            }
+            toggleCrearAgendaButton(true);
+        } else {
+            listaAgendasView.setVisibility(View.GONE);
+            if (fragmentContainer != null) {
+                fragmentContainer.setVisibility(View.VISIBLE);
+            }
+            toggleCrearAgendaButton(false);
+        }
     }
 }

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -15,6 +16,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import APIs.Users;
 import Requests_Responses.LoginRequest;
 import Requests_Responses.LoginResponse;
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -25,6 +28,7 @@ public class IniciarSesion extends AppCompatActivity {
 
     private EditText barraCorreo, barraContrasena;
     private Users usuariosApi;
+    private static final String TAG = "IniciarSesion";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,9 +52,17 @@ public class IniciarSesion extends AppCompatActivity {
         Button registrarse = findViewById(R.id.BotonRegistrarse);
         TextView cambiarContrasena = findViewById(R.id.ContraseñaOlvidadaTexto);
 
+        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor(message -> Log.d(TAG + "_OkHttp", message));
+        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+        OkHttpClient client = new OkHttpClient.Builder()
+                .addInterceptor(loggingInterceptor)
+                .build();
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://10.0.2.2:8080/")
                 .addConverterFactory(GsonConverterFactory.create())
+                .client(client)
                 .build();
 
         usuariosApi = retrofit.create(Users.class);
@@ -62,11 +74,11 @@ public class IniciarSesion extends AppCompatActivity {
         }
 
         iniciarSesion.setOnClickListener(v -> {
-            String correo = barraCorreo.getText().toString().trim();
-            String password = barraContrasena.getText().toString().trim();
+            String correoInput = barraCorreo.getText().toString().trim();
+            String passwordInput = barraContrasena.getText().toString().trim();
 
-            if (!correo.isEmpty() && !password.isEmpty()) {
-                verificarUsuario(correo, password);
+            if (!correoInput.isEmpty() && !passwordInput.isEmpty()) {
+                verificarUsuario(correoInput, passwordInput);
             } else {
                 Toast.makeText(IniciarSesion.this, "Faltan credenciales", Toast.LENGTH_SHORT).show();
             }
@@ -75,59 +87,71 @@ public class IniciarSesion extends AppCompatActivity {
         registrarse.setOnClickListener(v -> {
             Intent intent = new Intent(IniciarSesion.this, Registro.class);
             startActivity(intent);
-            finish();
         });
 
         cambiarContrasena.setOnClickListener(v -> {
             Intent intent = new Intent(IniciarSesion.this, CambiarContraseña.class);
             startActivity(intent);
-            finish();
         });
     }
 
     private void verificarUsuario(String correo, String password) {
         LoginRequest request = new LoginRequest(correo, password);
+        Log.d(TAG, "Enviando petición de login para: " + correo);
 
         Call<LoginResponse> call = usuariosApi.loginUsuario(request);
         call.enqueue(new Callback<>() {
             @Override
             public void onResponse(@NonNull Call<LoginResponse> call, @NonNull Response<LoginResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    boolean resultado = response.body().isSuccess();
-                    if (resultado) {
-                        String nombreUsuario = response.body().getNombreUsuario();
-                        guardarUsuarioEnSesion(correo, nombreUsuario);
-                        Intent intent = new Intent(IniciarSesion.this, MenuPrincipal.class);
-                        startActivity(intent);
-                        finish();
+                    LoginResponse loginResponse = response.body();
+                    Log.d(TAG, "Respuesta de login - Success: " + loginResponse.isSuccess() + ", Message: " + loginResponse.getMessage() + ", NombreUsuario: " + loginResponse.getNombreUsuario());
+                    if (loginResponse.isSuccess()) {
+                        String nombreUsuarioApi = loginResponse.getNombreUsuario();
+                        if (nombreUsuarioApi != null && !nombreUsuarioApi.trim().isEmpty()) {
+                            guardarUsuarioEnSesion(correo, nombreUsuarioApi);
+                            Intent intent = new Intent(IniciarSesion.this, MenuPrincipal.class);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            Log.e(TAG, "Nombre de usuario recibido de la API es nulo o vacío.");
+                            Toast.makeText(IniciarSesion.this, "Error: No se recibió el nombre de usuario del servidor.", Toast.LENGTH_LONG).show();
+                        }
                     } else {
-                        Toast.makeText(IniciarSesion.this, "Credenciales incorrectas", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(IniciarSesion.this, "Credenciales incorrectas: " + loginResponse.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 } else {
+                    String errorBodyString = "";
                     try {
-                        assert response.errorBody() != null;
-                        String errorBody = response.errorBody().string();
-                        Toast.makeText(IniciarSesion.this, "Error: " + errorBody, Toast.LENGTH_LONG).show();
-                        System.out.println("Error body: " + errorBody);
+                        if (response.errorBody() != null) {
+                            errorBodyString = response.errorBody().string();
+                        }
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        Log.e(TAG, "Error al parsear errorBody", e);
                     }
+                    Log.e(TAG, "Error en login - Código: " + response.code() + ", Cuerpo del error: " + errorBodyString);
+                    Toast.makeText(IniciarSesion.this, "Error en el servidor: " + response.code(), Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<LoginResponse> call, @NonNull Throwable t) {
-                Toast.makeText(IniciarSesion.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                t.printStackTrace();
+                Log.e(TAG, "Fallo en la llamada de login", t);
+                Toast.makeText(IniciarSesion.this, "Error de conexión: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void guardarUsuarioEnSesion(String correo, String nombreUsuario) {
+        Log.d(TAG, "Guardando en SharedPreferences - email: " + correo + ", nombre_usuario: " + nombreUsuario);
         SharedPreferences preferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("email", correo);
         editor.putString("nombre_usuario", nombreUsuario);
-        editor.apply();
+        boolean commitExitoso = editor.commit();
+        Log.d(TAG, "SharedPreferences commit exitoso para nombre_usuario: " + commitExitoso + ". Nombre guardado: " + nombreUsuario);
+        if (!commitExitoso) {
+            Log.e(TAG, "¡FALLO AL GUARDAR EN SHARED PREFERENCES!");
+        }
     }
 }
