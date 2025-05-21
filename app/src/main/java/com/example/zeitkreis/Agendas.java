@@ -67,6 +67,7 @@ public class Agendas extends AppCompatActivity {
 
                 List<String> nombresAgendas = new ArrayList<>();
                 for (AllDiariesResponse.Agenda agenda : agendas) {
+                    Log.d(TAG, "Procesando agenda para la lista: Nombre='" + agenda.getNombre() + "', ID='" + agenda.getId() + "'");
                     String nombre = agenda.getNombre() != null ? agenda.getNombre() : "(Sin nombre)";
                     nombresAgendas.add(nombre);
                 }
@@ -79,7 +80,9 @@ public class Agendas extends AppCompatActivity {
         viewModel.errorMessage.observe(this, errorMsg -> {
             if (errorMsg != null && !errorMsg.isEmpty()) {
                 Toast.makeText(Agendas.this, errorMsg, Toast.LENGTH_LONG).show();
-                viewModel._errorMessage.setValue(null);
+                if (viewModel._errorMessage != null) {
+                    viewModel._errorMessage.setValue(null);
+                }
             }
         });
     }
@@ -93,22 +96,31 @@ public class Agendas extends AppCompatActivity {
         listaAgendasView.setOnItemClickListener((parent, view, position, id) -> {
             if (fragmentContainer == null) {
                 Toast.makeText(Agendas.this, "No se encontró el contenedor del fragmento.", Toast.LENGTH_SHORT).show();
-                Log.e(TAG, "Contenedor R.id.chat es nulo.");
+                Log.e(TAG, "Contenedor R.id.chat es nulo. No se puede cargar el fragmento de chat.");
                 return;
             }
 
-            if (currentAgendasList != null && position < currentAgendasList.size()) {
+            if (currentAgendasList != null && position >= 0 && position < currentAgendasList.size()) {
                 AllDiariesResponse.Agenda agendaSeleccionada = currentAgendasList.get(position);
-                Long idAgenda = agendaSeleccionada.getId();
+                Long idAgenda = agendaSeleccionada.getId(); // Obtener el ID
                 String nombreAgenda = agendaSeleccionada.getNombre();
 
-                Log.d(TAG, "Agenda seleccionada: " + nombreAgenda + " (ID: " + idAgenda + ")");
+                Log.d(TAG, "OnItemClick - Agenda seleccionada: '" + nombreAgenda + "'.");
+                Log.d(TAG, "OnItemClick - ID recuperado de agendaSeleccionada.getId(): " + idAgenda);
+
+                if (idAgenda == null) {
+                    Log.e(TAG, "OnItemClick - ¡ATENCIÓN! idAgenda es NULL para la agenda '" + nombreAgenda + "'. Se pasará -1L al fragmento de chat.");
+                    Toast.makeText(Agendas.this, "Error: ID de agenda no disponible para '" + nombreAgenda + "'.", Toast.LENGTH_LONG).show();
+                }
 
                 AgendaFragments agendaFragments = new AgendaFragments();
                 Bundle args = new Bundle();
+
                 args.putLong("agendaId", idAgenda != null ? idAgenda : -1L);
                 args.putString("agendaNombre", nombreAgenda != null ? nombreAgenda : "(Sin nombre)");
                 agendaFragments.setArguments(args);
+
+                Log.d(TAG, "OnItemClick - Argumentos preparados para el fragmento: agendaId=" + (idAgenda != null ? idAgenda : -1L) + ", agendaNombre='" + (nombreAgenda != null ? nombreAgenda : "(Sin nombre)") + "'");
 
                 toggleCrearAgendaButton(false);
 
@@ -119,8 +131,11 @@ public class Agendas extends AppCompatActivity {
                 transaction.replace(R.id.chat, agendaFragments);
                 transaction.addToBackStack("AgendaFragmentsTransaction");
                 transaction.commit();
+                Log.d(TAG, "OnItemClick - Transacción de fragmento comprometida.");
+
             } else {
-                Log.e(TAG, "Error: currentAgendasList es nulo o la posición está fuera de los límites.");
+                Log.e(TAG, "Error en OnItemClick: currentAgendasList es nulo, la posición (" + position + ") está fuera de los límites, o el tamaño de la lista es " + (currentAgendasList != null ? currentAgendasList.size() : "null"));
+                Toast.makeText(Agendas.this, "Error al seleccionar la agenda.", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -129,7 +144,7 @@ public class Agendas extends AppCompatActivity {
     private void toggleCrearAgendaButton(boolean isVisible) {
         if (crearAgendaButton != null) {
             crearAgendaButton.setVisibility(isVisible ? View.VISIBLE : View.INVISIBLE);
-            Log.d(TAG, "Botón Crear Agenda visibilidad: " + isVisible);
+            Log.d(TAG, "Botón Crear Agenda visibilidad actualizada a: " + (isVisible ? "VISIBLE" : "INVISIBLE"));
         }
     }
 
@@ -137,23 +152,26 @@ public class Agendas extends AppCompatActivity {
     public void onBackPressed() {
         if (fragmentContainer != null && fragmentContainer.getVisibility() == View.VISIBLE &&
                 getSupportFragmentManager().getBackStackEntryCount() > 0) {
-            Log.d(TAG, "onBackPressed: AgendaFragments está visible, dejando que el sistema lo maneje.");
+            Log.d(TAG, "onBackPressed: Contenedor de fragmento visible y backstack no vacío. Dejando que el sistema maneje el pop.");
+            super.onBackPressed();
         } else {
-            Log.d(TAG, "onBackPressed: No hay fragmentos en el backstack o el contenedor no está visible. Comportamiento por defecto.");
+            Log.d(TAG, "onBackPressed: No hay fragmentos en el backstack gestionado por esta lógica o el contenedor no está visible. Comportamiento por defecto (cerrar actividad si es el caso).");
+            super.onBackPressed();
         }
-        super.onBackPressed();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
+            Log.d(TAG, "onResume: Back stack vacío. Mostrando lista de agendas.");
             listaAgendasView.setVisibility(View.VISIBLE);
             if (fragmentContainer != null) {
                 fragmentContainer.setVisibility(View.GONE);
             }
             toggleCrearAgendaButton(true);
         } else {
+            Log.d(TAG, "onResume: Back stack NO vacío. Mostrando contenedor de fragmento.");
             listaAgendasView.setVisibility(View.GONE);
             if (fragmentContainer != null) {
                 fragmentContainer.setVisibility(View.VISIBLE);

@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -25,7 +26,7 @@ public class MensajeAdaptador extends RecyclerView.Adapter<MensajeAdaptador.Mens
     private static final String TAG = "MensajeAdaptador";
 
     public MensajeAdaptador(List<MessageResponse> mensajes) {
-        this.mensajes = mensajes;
+        this.mensajes = (mensajes != null) ? mensajes : new ArrayList<>();
     }
 
     @NonNull
@@ -43,15 +44,12 @@ public class MensajeAdaptador extends RecyclerView.Adapter<MensajeAdaptador.Mens
         holder.autor.setText(mensaje.getAutor());
 
         String timestampString = mensaje.getTimestamp();
-        Log.d(TAG, "Procesando timestamp string: " + timestampString + " para mensaje: " + mensaje.getTexto()); // Log del string original
         Date date = null;
 
         try {
             long millis = Long.parseLong(timestampString);
             date = new Date(millis);
-            Log.d(TAG, "Timestamp parseado como long (millis): " + millis);
         } catch (NumberFormatException e) {
-            Log.d(TAG, "Timestamp no es un long, intentando formatos de fecha string.");
             String[] possibleFormats = {
                     "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
                     "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
@@ -64,14 +62,11 @@ public class MensajeAdaptador extends RecyclerView.Adapter<MensajeAdaptador.Mens
             for (String formatPattern : possibleFormats) {
                 try {
                     SimpleDateFormat sdf = new SimpleDateFormat(formatPattern, Locale.US);
-
-                    if (formatPattern.endsWith("'Z'")) {
+                    if (formatPattern.endsWith("'Z'") || formatPattern.contains("XXX")) {
                         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
                     }
-
                     date = sdf.parse(timestampString);
                     if (date != null) {
-                        Log.d(TAG, "Timestamp '" + timestampString + "' parseado con formato: " + formatPattern);
                         break;
                     }
                 } catch (ParseException ignored) {}
@@ -83,8 +78,8 @@ public class MensajeAdaptador extends RecyclerView.Adapter<MensajeAdaptador.Mens
             SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
             holder.timestamp.setText(outputFormat.format(date));
         } else {
-            Log.w(TAG, "No se pudo parsear el timestamp: " + timestampString + ". Mostrando 'Fecha no válida'.");
-            holder.timestamp.setText("Fecha no válida");
+            Log.w(TAG, "No se pudo parsear el timestamp: " + timestampString + ". Mostrando placeholder.");
+            holder.timestamp.setText(timestampString);
         }
     }
 
@@ -92,6 +87,17 @@ public class MensajeAdaptador extends RecyclerView.Adapter<MensajeAdaptador.Mens
     public int getItemCount() {
         return mensajes.size();
     }
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void updateMessages(List<MessageResponse> newMessages) {
+        this.mensajes.clear();
+        if (newMessages != null) {
+            this.mensajes.addAll(newMessages);
+        }
+        notifyDataSetChanged();
+        Log.d(TAG, "Lista de mensajes actualizada en el adaptador. Nuevo tamaño: " + this.mensajes.size());
+    }
+
 
     public static class MensajeViewHolder extends RecyclerView.ViewHolder {
         TextView texto, autor, timestamp;

@@ -1,6 +1,5 @@
 package com.example.zeitkreis;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -12,36 +11,23 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import APIs.Chats;
-import Requests_Responses.MessageRequest;
-import Requests_Responses.MessageResponse;
-import okhttp3.OkHttpClient;
-import okhttp3.logging.HttpLoggingInterceptor;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 public class Chat extends Fragment {
 
     private RecyclerView recyclerViewMensajes;
     private EditText editTextMensaje;
-    private Chats chatsApi;
-    private List<MessageResponse> mensajes;
     private MensajeAdaptador adapter;
     private String nombreUsuarioActual;
     private Long currentAgendaId;
+    private ChatViewModel viewModel;
 
     private static final String TAG = "ChatFragment";
 
@@ -50,33 +36,30 @@ public class Chat extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         SharedPreferences preferences = requireContext().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
         logAllSharedPreferences(preferences);
         nombreUsuarioActual = preferences.getString("nombre_usuario", "UsuarioDesconocido_Chat");
         Log.d(TAG, "onCreate: Nombre de usuario leído de SharedPreferences: " + nombreUsuarioActual);
+        Log.d(TAG, "onCreate: Intentando obtener 'agendaId' de los argumentos.");
+        Bundle arguments = getArguments();
 
-        if (getArguments() != null) {
-            currentAgendaId = getArguments().getLong("agendaId", 1L);
+        if (arguments != null) {
+            Log.d(TAG, "onCreate: getArguments() no es NULL. Contenido del Bundle: " + arguments);
+            if (arguments.containsKey("agendaId")) {
+                Log.d(TAG, "onCreate: El Bundle CONTIENE la clave 'agendaId'.");
+                currentAgendaId = arguments.getLong("agendaId", -1L);
+                Log.d(TAG, "onCreate: 'agendaId' obtenido del Bundle: " + currentAgendaId);
+            } else {
+                Log.e(TAG, "onCreate: El Bundle NO CONTIENE la clave 'agendaId'. Se usará el valor por defecto.");
+                currentAgendaId = -1L;
+            }
         } else {
-            currentAgendaId = 1L;
+            Log.e(TAG, "onCreate: getArguments() es NULL. No se pueden obtener argumentos. Se usará el valor por defecto para agendaId.");
+            currentAgendaId = -1L;
         }
-        Log.d(TAG, "onCreate: agendaId: " + currentAgendaId);
-
-        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor(message -> Log.d(TAG + "_OkHttp", message));
-        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-
-        OkHttpClient client = new OkHttpClient.Builder()
-                .addInterceptor(loggingInterceptor)
-                .build();
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://10.0.2.2:8080/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(client)
-                .build();
-
-        chatsApi = retrofit.create(Chats.class);
+        Log.d(TAG, "onCreate: Valor final de currentAgendaId después de procesar argumentos: " + currentAgendaId);
+        viewModel = new ViewModelProvider(this).get(ChatViewModel.class);
+        Log.d(TAG, "onCreate: ChatViewModel inicializado.");
     }
 
     @Override
@@ -87,115 +70,87 @@ public class Chat extends Fragment {
         editTextMensaje = view.findViewById(R.id.editTextMensaje);
         Button buttonEnviarMensaje = view.findViewById(R.id.buttonEnviarMensaje);
 
-        recyclerViewMensajes.setLayoutManager(new LinearLayoutManager(getContext()));
-        if (mensajes == null) {
-            mensajes = new ArrayList<>();
-        }
-        if (adapter == null) {
-            adapter = new MensajeAdaptador(mensajes);
-            recyclerViewMensajes.setAdapter(adapter);
-        }
+        setupRecyclerView();
+        setupObservers();
+        setupListeners(buttonEnviarMensaje);
 
-        if (currentAgendaId != null) {
-            cargarMensajes(currentAgendaId);
+        if (currentAgendaId != null && currentAgendaId > 0) {
+            viewModel.fetchMessages(currentAgendaId);
         } else {
-            Log.e(TAG, "agendaId es nulo, no se pueden cargar mensajes.");
+            Log.e(TAG, "agendaId es nulo o inválido, no se pueden cargar mensajes.");
             Toast.makeText(getContext(), "Error: No se pudo determinar la agenda.", Toast.LENGTH_SHORT).show();
         }
 
+        return view;
+    }
 
+    private void setupRecyclerView() {
+        recyclerViewMensajes.setLayoutManager(new LinearLayoutManager(getContext()));
+        adapter = new MensajeAdaptador(new ArrayList<>());
+        recyclerViewMensajes.setAdapter(adapter);
+    }
+
+    private void setupObservers() {
+        viewModel.messagesList.observe(getViewLifecycleOwner(), messages -> {
+            if (messages != null) {
+                Log.d(TAG, "Observador: Lista de mensajes actualizada. Número de mensajes: " + messages.size());
+                adapter.updateMessages(messages);
+                if (!messages.isEmpty()) {
+                    recyclerViewMensajes.scrollToPosition(messages.size() - 1);
+                }
+            }
+        });
+
+        viewModel.errorMessage.observe(getViewLifecycleOwner(), errorMsg -> {
+            if (errorMsg != null && !errorMsg.isEmpty()) {
+                Toast.makeText(getContext(), errorMsg, Toast.LENGTH_LONG).show();
+                Log.e(TAG, "Observador: Error recibido: " + errorMsg);
+                viewModel.clearErrorMessage();
+            }
+        });
+
+        viewModel.isLoading.observe(getViewLifecycleOwner(), isLoading -> {
+            if (isLoading != null) {
+                Log.d(TAG, "Observador: isLoading: " + isLoading);
+            }
+        });
+
+        viewModel.messageSentSuccessfully.observe(getViewLifecycleOwner(), success -> {
+            if (success != null) {
+                if (success) {
+                    Toast.makeText(getContext(), "Mensaje enviado", Toast.LENGTH_SHORT).show();
+                    editTextMensaje.setText("");
+                } else {
+                    Log.d(TAG, "Observador: Mensaje no enviado (posiblemente error ya mostrado).");
+                }
+                viewModel.clearMessageSentStatus();
+            }
+        });
+    }
+
+    private void setupListeners(Button buttonEnviarMensaje) {
         buttonEnviarMensaje.setOnClickListener(v -> {
             String texto = editTextMensaje.getText().toString().trim();
 
-            Log.d(TAG, "Botón Enviar pulsado. Nombre de usuario actual para enviar: " + nombreUsuarioActual);
+            Log.d(TAG, "Botón Enviar pulsado. Usuario actual: " + nombreUsuarioActual);
 
-            if (nombreUsuarioActual.equals("UsuarioDesconocido_Chat") || nombreUsuarioActual.equals("ZZZ")) {
+            if (nombreUsuarioActual.equals("UsuarioDesconocido_Chat") || nombreUsuarioActual.equals("ZZZ") || nombreUsuarioActual.isEmpty()) {
                 Log.e(TAG, "Intento de enviar mensaje con nombre de usuario por defecto o inválido: " + nombreUsuarioActual);
                 Toast.makeText(getContext(), "Error: Nombre de usuario no configurado. Por favor, reinicie sesión.", Toast.LENGTH_LONG).show();
                 return;
             }
 
-            if (!texto.isEmpty() && currentAgendaId != null) {
-                enviarMensaje(texto, nombreUsuarioActual, currentAgendaId);
-            } else if (texto.isEmpty()){
+            if (!texto.isEmpty() && currentAgendaId != null && currentAgendaId > 0) {
+                viewModel.sendMessage(texto, nombreUsuarioActual, currentAgendaId);
+            } else if (texto.isEmpty()) {
                 Toast.makeText(getContext(), "El mensaje no puede estar vacío.", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(getContext(), "Error: No se pudo determinar la agenda para enviar el mensaje.", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        return view;
-    }
-
-    private void cargarMensajes(Long agendaId) {
-        Log.d(TAG, "Cargando mensajes para agendaId: " + agendaId);
-        chatsApi.obtenerMensajes(agendaId).enqueue(new Callback<>() {
-            @SuppressLint("NotifyDataSetChanged")
-            @Override
-            public void onResponse(@NonNull Call<List<MessageResponse>> call, @NonNull Response<List<MessageResponse>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    Log.d(TAG, "Mensajes recibidos: " + response.body().size());
-                    mensajes.clear();
-                    mensajes.addAll(response.body());
-                    adapter.notifyDataSetChanged();
-                    if (!mensajes.isEmpty()) {
-                        recyclerViewMensajes.scrollToPosition(mensajes.size() - 1);
-                    }
-                } else {
-                    String errorMessage = "Error al cargar los mensajes. Código: " + response.code();
-                    try {
-                        if (response.errorBody() != null) {
-                            errorMessage += " Detalles: " + response.errorBody().string();
-                        }
-                    } catch (Exception e) {
-                        Log.e(TAG, "Error al parsear errorBody en cargarMensajes", e);
-                    }
-                    Log.e(TAG, errorMessage);
-                    Toast.makeText(getContext(), "Error al cargar mensajes. " + response.code(), Toast.LENGTH_LONG).show();
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<List<MessageResponse>> call, @NonNull Throwable t) {
-                Log.e(TAG, "Error de conexión al cargar mensajes", t);
-                Toast.makeText(getContext(), "Error de conexión: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                Log.e(TAG, "Error al enviar: texto vacío o currentAgendaId inválido (" + currentAgendaId + ")");
             }
         });
     }
 
-    private void enviarMensaje(String texto, String autor, Long agendaId) {
-        Log.d(TAG, "Preparando para enviar mensaje - Texto: " + texto + ", Autor: " + autor + ", AgendaId: " + agendaId);
-        MessageRequest request = new MessageRequest(texto, autor, agendaId);
-
-        chatsApi.enviarMensaje(request).enqueue(new Callback<>() {
-            @Override
-            public void onResponse(@NonNull Call<MessageResponse> call, @NonNull Response<MessageResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    Log.d(TAG, "Mensaje enviado exitosamente. Respuesta del servidor: " + response.body());
-                    Toast.makeText(getContext(), "Mensaje enviado", Toast.LENGTH_SHORT).show();
-                    editTextMensaje.setText("");
-                    cargarMensajes(agendaId);
-                } else {
-                    String errorMessage = "Error al enviar el mensaje. Código: " + response.code();
-                    try {
-                        if (response.errorBody() != null) {
-                            errorMessage += " Detalles: " + response.errorBody().string();
-                        }
-                    } catch (Exception e) {
-                        Log.e(TAG, "Error al parsear errorBody en enviarMensaje", e);
-                    }
-                    Log.e(TAG, errorMessage);
-                    Toast.makeText(getContext(), "Error al enviar mensaje. " + response.code(), Toast.LENGTH_LONG).show();
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<MessageResponse> call, @NonNull Throwable t) {
-                Log.e(TAG, "Error de conexión al enviar mensaje", t);
-                Toast.makeText(getContext(), "Error de conexión al enviar: " + t.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });
-    }
 
     private void logAllSharedPreferences(SharedPreferences prefs) {
         Map<String, ?> allEntries = prefs.getAll();
@@ -211,6 +166,9 @@ public class Chat extends Fragment {
 
     @Override
     public void onResume() {
-        super.onResume();
+    super.onResume();
+    if (currentAgendaId != null && currentAgendaId > 0) {
+    viewModel.fetchMessages(currentAgendaId);
+        }
     }
 }

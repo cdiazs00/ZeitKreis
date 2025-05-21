@@ -11,6 +11,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 
 public interface Diaries {
     @POST("agendas")
@@ -21,4 +22,7 @@ public interface Diaries {
 
     @GET("agendas")
     Call<List<AllDiariesResponse.Agenda>> obtenerAgendas();
+
+    @GET("agendas/{agendaId}/miembros")
+    Call<List<UserSearchResponse.Usuario>> obtenerMiembrosDeAgenda(@Path("agendaId") Long agendaId);
 }
