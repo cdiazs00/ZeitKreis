@@ -18,16 +18,6 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
 
-        <meta-data
-            android:name="DB_URL"
-            android:value="${DB_URL}" />
-        <meta-data
-            android:name="DB_USER"
-            android:value="${DB_USER}" />
-        <meta-data
-            android:name="DB_PASSWORD"
-            android:value="${DB_PASSWORD}" />
-
         <activity
             android:name=".IniciarSesion"
             android:exported="true">
